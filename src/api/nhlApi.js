@@ -43,6 +43,9 @@ export function extractWildGoals(pbpData) {
   let wildSOG = 0;
   
   for (const play of plays) {
+    // Skip shootout plays entirely
+    if (play.periodDescriptor?.periodType === 'SO') continue;
+    
     // Count Wild shots on goal
     if (play.typeDescKey === 'shot-on-goal' || play.typeDescKey === 'goal') {
       const eventTeamId = play.details?.eventOwnerTeamId;
@@ -56,6 +59,9 @@ export function extractWildGoals(pbpData) {
       if (eventTeamId === wildTeamId) {
         const period = play.periodDescriptor?.number || 0;
         const periodType = play.periodDescriptor?.periodType || 'REG';
+        
+        // Skip shootout goals — they don't count as real goals
+        if (periodType === 'SO') continue;
         const timeInPeriod = play.timeInPeriod || '00:00';
         
         const scoringPlayerId = play.details?.scoringPlayerId;
@@ -125,9 +131,10 @@ export async function fetchAllWildGoals(onProgress) {
   const schedule = await fetchSeasonSchedule();
   const games = schedule.games || [];
   
-  // Filter to completed regular season games
+  // Filter to completed regular season games only (gameType 2 = regular, 3 = playoffs)
   const completedGames = games.filter(g => 
-    g.gameState === 'OFF' || g.gameState === 'FINAL'
+    (g.gameState === 'OFF' || g.gameState === 'FINAL') &&
+    (g.gameType === 2 || g.gameType === 3)
   );
   
   const allGoals = [];

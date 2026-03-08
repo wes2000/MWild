@@ -1,3 +1,10 @@
+// Parse "YYYY-MM-DD" without timezone shift
+function parseGameDate(dateStr) {
+  if (!dateStr) return new Date();
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 export function groupGoalsByPlayer(goals) {
   const players = {};
   for (const goal of goals) {
@@ -53,7 +60,7 @@ export function getGoalTimingDistribution(goals) {
 export function getGoalsByMonth(goals) {
   const months = {};
   for (const goal of goals) {
-    const date = new Date(goal.gameDate);
+    const date = parseGameDate(goal.gameDate);
     const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     const label = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
     if (!months[key]) {
@@ -81,10 +88,9 @@ export function getGoalsByPeriod(goals) {
 }
 
 export function getPlayerTimeline(playerGoals) {
-  // Show each goal as a point on a timeline
   return playerGoals.map((goal, idx) => ({
     goalNum: idx + 1,
-    date: new Date(goal.gameDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    date: parseGameDate(goal.gameDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     opponent: goal.opponent,
     period: goal.period,
     time: goal.time,
@@ -92,6 +98,8 @@ export function getPlayerTimeline(playerGoals) {
     totalSOG: goal.totalSOG,
   }));
 }
+
+export { parseGameDate };
 
 export function exportToCSV(goals) {
   const headers = ['Player', 'Period', 'Time', 'Date', 'Opponent', 'Home/Away', 'Total SOG', 'Assist 1', 'Assist 2'];

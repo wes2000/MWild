@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid, ScatterChart, Scatter, ZAxis } from 'recharts';
-import { getPlayerTimeline } from '../utils/dataProcessing';
+import { getPlayerTimeline, parseGameDate } from '../utils/dataProcessing';
 
 const COLORS = {
   green: '#154734',
@@ -140,7 +140,7 @@ export default function PlayerGrid({ players, allGoals, onSelectPlayer, selected
                         return (
                           <tr key={i}>
                             <td>{i + 1}</td>
-                            <td>{new Date(goal.gameDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
+                            <td>{parseGameDate(goal.gameDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</td>
                             <td>{goal.isHome ? 'vs' : '@'} {goal.opponent}</td>
                             <td><span className={`period-badge ${periodClass}`}>{goal.period === '1' ? '1st' : goal.period === '2' ? '2nd' : goal.period === '3' ? '3rd' : goal.period}</span></td>
                             <td>{goal.time}</td>

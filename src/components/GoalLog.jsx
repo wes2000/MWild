@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { parseGameDate } from '../utils/dataProcessing';
 
 export default function GoalLog({ goals, onExport }) {
   const [sortBy, setSortBy] = useState('date-desc');
@@ -26,8 +27,8 @@ export default function GoalLog({ goals, onExport }) {
     
     result.sort((a, b) => {
       switch (sortBy) {
-        case 'date-desc': return new Date(b.gameDate) - new Date(a.gameDate);
-        case 'date-asc': return new Date(a.gameDate) - new Date(b.gameDate);
+        case 'date-desc': return parseGameDate(b.gameDate) - parseGameDate(a.gameDate);
+        case 'date-asc': return parseGameDate(a.gameDate) - parseGameDate(b.gameDate);
         case 'player': return a.player.localeCompare(b.player);
         case 'period': return a.periodNum - b.periodNum || a.timeSeconds - b.timeSeconds;
         default: return 0;
@@ -135,7 +136,7 @@ export default function GoalLog({ goals, onExport }) {
                 return (
                   <tr key={i}>
                     <td style={{ color: 'var(--text-muted)' }}>{i + 1}</td>
-                    <td>{new Date(goal.gameDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                    <td>{parseGameDate(goal.gameDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
                     <td className="player-col">{goal.player}</td>
                     <td><span className={`period-badge ${periodClass}`}>{periodLabel}</span></td>
                     <td style={{ fontVariantNumeric: 'tabular-nums' }}>{goal.time}</td>
