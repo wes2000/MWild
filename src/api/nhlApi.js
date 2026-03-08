@@ -1,14 +1,17 @@
-const API_BASE = 'https://api-web.nhle.com/v1';
+const API_BASE = '/nhl-api';
 const TEAM = 'MIN';
 const SEASON = '20252026';
 
 export async function fetchSeasonSchedule() {
-  const res = await fetch(`${API_BASE}/club-schedule-season/${TEAM}/${SEASON}`);
-  if (!res.ok) {
+  // Try /now endpoint first (most reliable)
+  try {
     const now = await fetch(`${API_BASE}/club-schedule-season/${TEAM}/now`);
-    if (!now.ok) throw new Error('Failed to fetch schedule');
-    return now.json();
-  }
+    if (now.ok) return now.json();
+  } catch (e) { /* fall through */ }
+  
+  // Fallback to explicit season
+  const res = await fetch(`${API_BASE}/club-schedule-season/${TEAM}/${SEASON}`);
+  if (!res.ok) throw new Error(`Schedule fetch failed: ${res.status} ${res.statusText}`);
   return res.json();
 }
 
